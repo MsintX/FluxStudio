@@ -1,0 +1,14 @@
+.vs/
+**/bin/
+**/obj/
+build/
+dist/
+*.user
+*.suo
+*.pdb
+
+# Native cross-platform Flux interpreter build output
+Flux.Core/build/
+Flux.Core/obj/
+Flux.Core/bin/*
+!Flux.Core/bin/.gitkeep

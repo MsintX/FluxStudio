@@ -1,0 +1,7 @@
+{
+  "name": "FluxHello",
+  "version": "0.1.0",
+  "entry": "Main",
+  "source": "src/Main.flux",
+  "dependencies": {}
+}

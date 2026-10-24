@@ -1,0 +1,181 @@
+<Window
+    x:Class="FluxStudio.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:FluxStudio"
+    Title="Flux Studio">
+    <Grid x:Name="RootGrid" RowSpacing="0" Background="{ThemeResource SolidBackgroundFillColorBaseBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <MenuBar Grid.Row="0" Background="{ThemeResource SolidBackgroundFillColorBaseBrush}">
+            <MenuBarItem Title="文件">
+                <MenuFlyoutItem Text="新建" Click="New_Click" />
+                <MenuFlyoutItem Text="打开文件…" Click="Open_Click" />
+                <MenuFlyoutItem Text="打开项目 (flux.json)…" Click="OpenProject_Click" />
+                <MenuFlyoutSeparator />
+                <MenuFlyoutItem Text="保存" Click="Save_Click" />
+                <MenuFlyoutItem Text="另存为…" Click="SaveAs_Click" />
+                <MenuFlyoutSeparator />
+                <MenuFlyoutItem Text="退出" Click="Exit_Click" />
+            </MenuBarItem>
+            <MenuBarItem Title="编辑">
+                <MenuFlyoutItem Text="查找…" Click="Find_Click" />
+            </MenuBarItem>
+            <MenuBarItem Title="运行">
+                <MenuFlyoutItem Text="运行 (F5 / Ctrl+F5)" Click="Run_Click" />
+            </MenuBarItem>
+            <MenuBarItem Title="设置">
+                <MenuFlyoutItem Text="打开设置…" Click="Settings_Click" />
+            </MenuBarItem>
+            <MenuBarItem Title="主题">
+                <MenuFlyoutItem Text="跟随系统" Click="ThemeSystem_Click" />
+                <MenuFlyoutItem Text="浅色" Click="ThemeLight_Click" />
+                <MenuFlyoutItem Text="深色" Click="ThemeDark_Click" />
+            </MenuBarItem>
+            <MenuBarItem Title="帮助">
+                <MenuFlyoutItem Text="关于 Flux Studio" Click="About_Click" />
+            </MenuBarItem>
+        </MenuBar>
+        <CommandBar Grid.Row="1" DefaultLabelPosition="Right" Background="{ThemeResource SolidBackgroundFillColorBaseBrush}">
+            <AppBarButton Icon="OpenFile" Label="打开" Click="Open_Click" />
+            <AppBarButton Icon="Save" Label="保存" Click="Save_Click" />
+            <AppBarButton Icon="Document" Label="新建" Click="New_Click" />
+            <AppBarSeparator />
+            <AppBarButton Icon="Play" Label="运行" Click="Run_Click" />
+            <AppBarButton Icon="Setting" Label="设置" Click="Settings_Click" />
+        </CommandBar>
+        <Grid Grid.Row="2" ColumnSpacing="1" Background="{ThemeResource DividerStrokeColorDefaultBrush}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="240" MinWidth="170" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" Padding="12">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <TextBlock Text="项目资源管理器" FontWeight="SemiBold" Margin="0,0,0,10" />
+                <TreeView x:Name="ProjectTree" Grid.Row="1" />
+            </Grid>
+            <Grid Grid.Column="1" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" Padding="10" RowSpacing="8">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="190" />
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0" RowSpacing="6">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <TextBlock x:Name="DocumentTitle" Text="Main.flux" FontWeight="SemiBold" />
+                    <Grid Grid.Row="1">
+                        <RichEditBox x:Name="Editor" AcceptsReturn="True"
+                                     TextWrapping="NoWrap" FontFamily="Consolas" FontSize="14"
+                                     Background="{ThemeResource ControlFillColorDefaultBrush}"
+                                     Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                     BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
+                                     BorderThickness="1"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                     ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                     IsSpellCheckEnabled="False" TextChanged="Editor_TextChanged"
+                                     PreviewKeyDown="Editor_KeyDown" SelectionChanged="Editor_SelectionChanged" />
+                        <Border x:Name="CompletionPopup" Visibility="Collapsed"
+                                HorizontalAlignment="Left" VerticalAlignment="Top" Margin="12"
+                                MaxWidth="420" MaxHeight="280" CornerRadius="6" BorderThickness="1"
+                                BorderBrush="{ThemeResource ControlStrokeColorSecondaryBrush}"
+                                Background="{ThemeResource SolidBackgroundFillColorBaseBrush}">
+                            <ListView x:Name="CompletionList" MaxHeight="280" MinWidth="280"
+                                      IsItemClickEnabled="True" ItemClick="CompletionList_ItemClick"
+                                      SelectionMode="Single">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Padding="8,5" ColumnSpacing="14">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="{Binding Label}" FontFamily="Consolas"
+                                                       FontSize="13" />
+                                            <TextBlock Grid.Column="1" Text="{Binding Detail}" FontSize="12"
+                                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                       VerticalAlignment="Center" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </Border>
+                    </Grid>
+                </Grid>
+                <TabView x:Name="BottomTabs" Grid.Row="1" IsAddTabButtonVisible="False" CanReorderTabs="False">
+                    <TabViewItem x:Name="ErrorListTab" Header="错误列表" IsClosable="False"
+                                 HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+                        <Grid Background="Transparent"
+                              HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                            <ListView x:Name="DiagnosticsList" Visibility="Collapsed" IsItemClickEnabled="True"
+                                      HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                      Background="Transparent"
+                                      ItemClick="DiagnosticsList_ItemClick">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Padding="8,5" ColumnSpacing="10">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="64" />
+                                                <ColumnDefinition Width="72" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="{Binding Severity}" FontWeight="SemiBold" />
+                                            <TextBlock Grid.Column="1" Text="{Binding Code}"
+                                                       FontFamily="Consolas" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                            <TextBlock Grid.Column="2" Text="{Binding Line}"
+                                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                            <TextBlock Grid.Column="3" Text="{Binding Column}"
+                                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                            <TextBlock Grid.Column="4" Text="{Binding Message}" TextWrapping="Wrap" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                            <Grid x:Name="DiagnosticsEmptyState" Background="Transparent"
+                                  HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                  IsHitTestVisible="False" Visibility="Visible">
+                                <StackPanel Orientation="Horizontal" Spacing="9"
+                                            HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <FontIcon Glyph="&#xE73E;" FontFamily="Segoe MDL2 Assets"
+                                              FontSize="18" Foreground="#FF22A06B" />
+                                    <TextBlock Text="未找到相关问题" FontSize="14"
+                                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                               VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Grid>
+                        </Grid>
+                    </TabViewItem>
+                    <TabViewItem x:Name="OutputTab" Header="输出" IsClosable="False">
+                        <TextBox x:Name="OutputBox" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap"
+                                 FontFamily="Consolas" FontSize="12"
+                                 Background="{ThemeResource ControlFillColorDefaultBrush}"
+                                 Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                 ScrollViewer.VerticalScrollBarVisibility="Auto" />
+                    </TabViewItem>
+                </TabView>
+            </Grid>
+        </Grid>
+        <Grid Grid.Row="3" Padding="10,6" ColumnSpacing="14" Background="{ThemeResource SubtleFillColorSecondaryBrush}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="14" VerticalAlignment="Center">
+                <TextBlock x:Name="StatusText" Text="就绪 - 新建文件或打开 Flux 项目" />
+                <TextBlock x:Name="DocumentInfoText" Text="UTF-8 · LF · 1 行 · 0 字符"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            </StackPanel>
+            <TextBlock x:Name="CaretText" Grid.Column="1" Text="Ln 1, Col 1" />
+        </Grid>
+    </Grid>
+</Window>
